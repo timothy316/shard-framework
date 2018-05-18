@@ -1,15 +1,79 @@
-package com.timothy.shard;
+package com.timothy.shard.core;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.sql.DataSource;
 import java.sql.*;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 
 /**
+ * 虚拟Connection抽象类
+ *
  * @author zhengxun
- * @version 2018-05-14
+ * @date 2018-05-18
  */
-public abstract class AbstractConnection implements VirtualConnection {
+public abstract class AbstractConnection<T> implements VirtualConnection<T> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractConnection.class);
+
+    /**
+     * 虚拟数据源
+     */
+    private VirtualDataSource virtualDataSource;
+
+    /**
+     * 用户名
+     */
+    private String username;
+    /**
+     * 密码
+     */
+    private String password;
+
+    public AbstractConnection(VirtualDataSource virtualDataSource) {
+        this.virtualDataSource = virtualDataSource;
+    }
+
+    public AbstractConnection(VirtualDataSource virtualDataSource, String username, String password) {
+        this.virtualDataSource = virtualDataSource;
+        this.username = username;
+        this.password = password;
+    }
+
+    /**
+     * 获取真实数据库链接
+     * @param shard
+     * @return
+     * @throws SQLException
+     */
+    protected Connection getActualConnection(T shard) throws SQLException {
+        Connection resultConnection = null;
+        synchronized (this) {
+            if(username != null){
+                resultConnection = virtualDataSource.createActualConnection(shard, username, password);
+            } else {
+                resultConnection = virtualDataSource.createActualConnection(shard);
+            }
+        }
+        return resultConnection;
+    }
+
+    @Override
+    public Statement createActualStatement(T shard) throws SQLException {
+        return getActualConnection(shard).createStatement();
+    }
+
+    @Override
+    public PreparedStatement createActualPreparedStatement(T shard, String sql) throws SQLException {
+        return getActualConnection(shard).prepareStatement(sql);
+    }
+
+    @Override
+    public DataSource getDataSource() {
+        return virtualDataSource;
+    }
 
     @Override
     public Statement createStatement(int resultSetType, int resultSetConcurrency) throws SQLException {

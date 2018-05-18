@@ -1,8 +1,9 @@
-package com.timothy.shard;
+package com.timothy.shard.core;
 
 /**
+ * 虚拟preparedStatement
  * @author zhengxun
- * @version 2018-05-14
+ * @date 2018-05-18
  */
 public interface VirtualPreparedStatement extends VirtualStatement{
 }
