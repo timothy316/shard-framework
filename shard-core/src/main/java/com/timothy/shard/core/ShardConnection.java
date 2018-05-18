@@ -1,5 +1,7 @@
 package com.timothy.shard.core;
 
+import com.timothy.shard.core.sharding.ShardConfig;
+
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
