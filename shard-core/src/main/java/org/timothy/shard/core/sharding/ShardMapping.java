@@ -1,25 +1,22 @@
-package com.timothy.shard.core.sharding;
+package org.timothy.shard.core.sharding;
 
 /**
- * 根据一定规则匹配到的shardId以及对应的真实数据源名称
- * 后续会根据据此从shardConfig中配置的拆分信息获取真实数据源引用
+ * 拆分键id以及对应的实际数据源配置对象
+ *
  * @author zhengxun
  * @date 2018-05-18
  */
-public class Shard {
+public class ShardMapping {
+
     /**
-     * 拆分id
+     * 拆分键id
      */
     private int shardId;
+
     /**
-     * 数据库源名称
+     * 实际数据源名称
      */
     private String dataSourceName;
-
-    public Shard(int shardId, String dataSourceName) {
-        this.shardId = shardId;
-        this.dataSourceName = dataSourceName;
-    }
 
     public int getShardId() {
         return shardId;
@@ -39,7 +36,7 @@ public class Shard {
 
     @Override
     public String toString() {
-        return "Shard{" +
+        return "ShardMapping{" +
                 "shardId=" + shardId +
                 ", dataSourceName='" + dataSourceName + '\'' +
                 '}';

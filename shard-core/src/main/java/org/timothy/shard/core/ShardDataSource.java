@@ -1,8 +1,8 @@
-package com.timothy.shard.core;
+package org.timothy.shard.core;
 
-import com.timothy.shard.core.sharding.DataSourceItem;
-import com.timothy.shard.core.sharding.Shard;
-import com.timothy.shard.core.sharding.ShardConfig;
+import org.timothy.shard.core.sharding.DataSourceItem;
+import org.timothy.shard.core.sharding.Shard;
+import org.timothy.shard.core.sharding.ShardConfig;
 
 import javax.sql.DataSource;
 import java.sql.Connection;

@@ -1,6 +1,6 @@
-package com.timothy.shard.core;
+package org.timothy.shard.core;
 
-import com.timothy.shard.core.sharding.ShardConfig;
+import org.timothy.shard.core.sharding.ShardConfig;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -32,11 +32,11 @@ public class ShardConnection extends AbstractConnection {
 
     @Override
     public Statement createStatement() throws SQLException {
-        return null;
+        return new ShardStatement(this);
     }
 
     @Override
     public PreparedStatement prepareStatement(String sql) throws SQLException {
-        return null;
+        return new ShardStatement(this, sql);
     }
 }

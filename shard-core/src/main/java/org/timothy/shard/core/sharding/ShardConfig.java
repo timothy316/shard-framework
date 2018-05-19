@@ -1,4 +1,4 @@
-package com.timothy.shard.core.sharding;
+package org.timothy.shard.core.sharding;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.timothy.shard.core;
+package org.timothy.shard.core;
 
 import javax.sql.DataSource;
 import java.io.PrintWriter;
