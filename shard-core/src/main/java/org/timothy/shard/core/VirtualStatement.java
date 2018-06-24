@@ -1,7 +1,7 @@
 package org.timothy.shard.core;
 
 import org.timothy.shard.core.sharding.ShardAndSql;
-import org.timothy.shard.core.sharding.Sql;
+import org.timothy.shard.core.sql.Sql;
 
 import java.sql.SQLException;
 import java.sql.Statement;

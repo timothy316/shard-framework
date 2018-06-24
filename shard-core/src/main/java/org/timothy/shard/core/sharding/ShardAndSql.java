@@ -1,5 +1,7 @@
 package org.timothy.shard.core.sharding;
 
+import org.timothy.shard.core.sql.Sql;
+
 /**
  * @author zhengxun
  * @date 2018-05-19
@@ -30,5 +32,13 @@ public class ShardAndSql<T> {
 
     public void setSql(Sql sql) {
         this.sql = sql;
+    }
+
+    @Override
+    public String toString() {
+        return "ShardAndSql{" +
+                "shard=" + shard +
+                ", sql=" + sql +
+                '}';
     }
 }

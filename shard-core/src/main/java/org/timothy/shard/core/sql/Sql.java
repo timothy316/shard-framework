@@ -1,12 +1,13 @@
-package org.timothy.shard.core.sharding;
+package org.timothy.shard.core.sql;
 
 import java.util.SortedMap;
+import java.util.TreeMap;
 
 /**
  * @author zhengxun
  * @date 2018-05-19
  */
-public class Sql {
+public class Sql implements Cloneable{
 
     /**
      * 上层传递的Sql,包含占位符
@@ -38,6 +39,11 @@ public class Sql {
 
     public SortedMap<Integer, Object> getParameters() {
         return parameters;
+    }
+
+    @Override
+    public Sql clone() {
+        return new Sql(text, prepared, parameters == null ? null : new TreeMap<Integer, Object>(parameters));
     }
 
     @Override

@@ -1,6 +1,6 @@
 package org.timothy.shard.core;
 
-import org.timothy.shard.core.sharding.ShardConfig;
+import org.timothy.shard.core.sharding.ShardRouterStrategy;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -14,29 +14,25 @@ import java.sql.Statement;
  */
 public class ShardConnection extends AbstractConnection {
 
+    private ShardRouterStrategy shardRouterStrategy;
 
-    /**
-     * 拆分基础配置信息
-     */
-    private ShardConfig shardConfig;
-
-    public ShardConnection(VirtualDataSource virtualDataSource, ShardConfig shardConfig) {
+    public ShardConnection(VirtualDataSource virtualDataSource, ShardRouterStrategy shardRouterStrategy) {
         super(virtualDataSource);
-        this.shardConfig = shardConfig;
+        this.shardRouterStrategy = shardRouterStrategy;
     }
 
-    public ShardConnection(VirtualDataSource virtualDataSource, ShardConfig shardConfig, String username, String password) {
+    public ShardConnection(VirtualDataSource virtualDataSource, ShardRouterStrategy shardRouterStrategy, String username, String password) {
         super(virtualDataSource, username, password);
-        this.shardConfig = shardConfig;
+        this.shardRouterStrategy = shardRouterStrategy;
     }
 
     @Override
     public Statement createStatement() throws SQLException {
-        return new ShardStatement(this);
+        return new ShardStatement(this.shardRouterStrategy,this, null);
     }
 
     @Override
     public PreparedStatement prepareStatement(String sql) throws SQLException {
-        return new ShardStatement(this, sql);
+        return new ShardStatement(this.shardRouterStrategy, this, sql);
     }
 }

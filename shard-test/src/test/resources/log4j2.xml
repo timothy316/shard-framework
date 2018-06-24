@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration status="WARN">
+    <!--全局参数-->
+    <Properties>
+        <Property name="pattern">%d{yyyy-MM-dd HH:mm:ss,SSS} %5p %c{1}:%L - %m%n</Property>
+    </Properties>
+    <Loggers>
+        <logger name="java.sql" level="DEBUG" additivity="false"/>
+        <logger name="java.sql.ResultSet" level="DEBUG" additivity="false"/>
+        <logger name="com.ibatis" level="DEBUG" additivity="false"/>
+        <logger name="org.apache" level="ERROR" additivity="false"/>
+        <logger name="org.apache.ibatis" level="DEBUG" additivity="false"/>
+        <logger name="org.springframework" level="ERROR" additivity="false"/>
+        <logger name="com.mchange" level="ERROR" additivity="false"/>
+        <logger name="org.apache.commons" level="ERROR" additivity="false"/>
+        <Root level="DEBUG">
+            <AppenderRef ref="console"></AppenderRef>
+        </Root>
+
+    </Loggers>
+    <Appenders>
+        <Console name="console" target="SYSTEM_OUT" follow="true">
+            <!--控制台只输出level及以上级别的信息-->
+            <ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout>
+                <Pattern>${pattern}</Pattern>
+            </PatternLayout>
+        </Console>
+    </Appenders>
+</configuration>

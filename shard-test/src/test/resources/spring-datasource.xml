@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd">
+    <!-- =========================================分库分表云数据库(begin)========================================= -->
+    <bean id="abstractDatasourceCloud" abstract="true" class="org.apache.commons.dbcp2.BasicDataSource">
+        <property name="driverClassName" value="${datasource.cloud.driverClassName}"/>
+        <property name="username" value="${datasource.cloud.username}"/>
+        <property name="password" value="${datasource.cloud.password}"/>
+        <property name="defaultAutoCommit" value="${datasource.cloud.defaultAutoCommit}"/>
+        <property name="initialSize" value="${datasource.cloud.initialSize}"/>
+        <property name="maxTotal" value="${datasource.cloud.maxActive}"/>
+        <property name="maxIdle" value="${datasource.cloud.maxIdle}"/>
+        <property name="minIdle" value="${datasource.cloud.minIdle}"/>
+        <property name="maxWaitMillis" value="${datasource.cloud.maxWait}"/>
+        <property name="testOnBorrow" value="${datasource.cloud.testOnBorrow}"/>
+        <property name="testOnReturn" value="${datasource.cloud.testOnReturn}"/>
+        <property name="testWhileIdle" value="${datasource.cloud.testWhileIdle}"/>
+        <property name="validationQuery" value="${datasource.cloud.validationQuery}"/>
+        <property name="minEvictableIdleTimeMillis" value="${datasource.cloud.minEvictableIdleTimeMillis}"/>
+        <property name="timeBetweenEvictionRunsMillis" value="${datasource.cloud.timeBetweenEvictionRunsMillis}"/>
+        <!--<property name="removeAbandoned" value="${datasource.cloud.removeAbandoned}"/>-->
+        <property name="removeAbandonedTimeout" value="${datasource.cloud.removeAbandonedTimeout}"/>
+        <property name="logAbandoned" value="${datasource.cloud.logAbandoned}"/>
+    </bean>
+
+    <bean id="datasourceCloud1" parent="abstractDatasourceCloud">
+        <property name="url"
+                  value="${cloudDataSourceProperties.urlMap.ds1}"/>
+    </bean>
+    <bean id="datasourceCloud2" parent="abstractDatasourceCloud">
+        <property name="url"
+                  value="${cloudDataSourceProperties.urlMap.ds2}"/>
+    </bean>
+
+
+    <bean id="shardDataSource" class="org.timothy.shard.core.ShardDataSource">
+
+        <constructor-arg index="0">
+            <list>
+                <bean class="org.timothy.shard.core.sharding.DataSourceItem">
+                    <property name="dataSourceName" value="dataSource1"/>
+                    <property name="actualDataSource" ref="datasourceCloud1"/>
+                </bean>
+                <bean class="org.timothy.shard.core.sharding.DataSourceItem">
+                    <property name="dataSourceName" value="dataSource2"/>
+                    <property name="actualDataSource" ref="datasourceCloud2"/>
+                </bean>
+
+            </list>
+        </constructor-arg>
+
+        <constructor-arg index="1">
+            <bean class="org.timothy.shard.core.sharding.router.HashShardRouterStrategy">
+                <constructor-arg index="0">
+                    <bean class="org.timothy.shard.core.sharding.router.ShardConfig">
+                        <property name="shardSize" value="4"/>
+                        <property name="shardTableList">
+                            <list>
+                                <bean class="org.timothy.shard.core.sql.ShardTable">
+                                    <property name="tableName" value="user"/>
+                                    <property name="shardColumnNameList">
+                                        <list>
+                                            <value>name</value>
+                                        </list>
+                                    </property>
+                                </bean>
+                            </list>
+                        </property>
+
+                        <property name="shardMappingList">
+                            <list>
+                                <bean class="org.timothy.shard.core.sharding.ShardMapping">
+                                    <property name="shardId" value="0"/>
+                                    <property name="dataSourceName" value="dataSource1"/>
+                                </bean>
+                                <bean class="org.timothy.shard.core.sharding.ShardMapping">
+                                    <property name="shardId" value="1"/>
+                                    <property name="dataSourceName" value="dataSource2"/>
+                                </bean>
+                            </list>
+                        </property>
+                    </bean>
+                </constructor-arg>
+            </bean>
+        </constructor-arg>
+    </bean>
+
+    <bean id="cloudSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="configLocation" value="classpath:mybatis/mybatis-cloud-config.xml"/>
+        <property name="dataSource" ref="shardDataSource"/>
+    </bean>
+    <bean id="cloudSqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg index="0" ref="cloudSqlSessionFactory"/>
+    </bean>
+    <bean id="cloudTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="shardDataSource"/>
+        <property name="rollbackOnCommitFailure" value="true"/>
+    </bean>
+</beans>

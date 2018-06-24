@@ -1,4 +1,7 @@
-package org.timothy.shard.core.sharding;
+package org.timothy.shard.core.sharding.router;
+
+import org.timothy.shard.core.sharding.ShardMapping;
+import org.timothy.shard.core.sql.ShardTable;
 
 import java.util.List;
 
@@ -24,13 +27,37 @@ public class ShardConfig {
      */
     private List<ShardMapping> shardMappingList;
 
+    /**
+     * 根据shardId获取数据源名称
+     *
+     * @param shardId
+     * @return
+     */
+    public String getDataSourceNameByShardId(int shardId) {
+        for (ShardMapping shardMapping : shardMappingList) {
+            if (shardMapping.getShardId() == shardId) {
+                return shardMapping.getDataSourceName();
+            } else {
+                throw new RuntimeException("未找到对应的数据源名称，请确认是否配置");
+            }
+        }
+        return null;
+    }
+
+
+
+
 
     public int getShardSize() {
         return shardSize;
     }
 
     public void setShardSize(int shardSize) {
-        this.shardSize = shardSize;
+        if((shardSize & (shardSize - 1)) == 0){
+            this.shardSize = shardSize;
+        } else {
+            throw new RuntimeException("请确保shardSize的数值为2的幂次方");
+        }
     }
 
     public List<ShardTable> getShardTableList() {

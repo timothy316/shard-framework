@@ -11,6 +11,12 @@ import java.sql.*;
 public abstract class AbstractStatement<T> implements VirtualStatement<T>{
 
     protected VirtualConnection virtualConnection;
+    /**
+     * open标志
+     */
+    private boolean closed;
+
+    private Statement currentStatement;
 
 
     public AbstractStatement(VirtualConnection virtualConnection) {
@@ -20,6 +26,12 @@ public abstract class AbstractStatement<T> implements VirtualStatement<T>{
     protected Statement createActualStatement(ShardAndSql shardAndSql) throws SQLException {
         Statement statement = virtualConnection.createActualStatement(shardAndSql.getShard());
         return statement;
+    }
+
+    private void checkIsOpen(){
+        if(closed){
+            throw new RuntimeException("Statement已关闭");
+        }
     }
     @Override
     public ResultSet executeQuery(String sql) throws SQLException {
@@ -33,6 +45,8 @@ public abstract class AbstractStatement<T> implements VirtualStatement<T>{
 
     @Override
     public void close() throws SQLException {
+        checkIsOpen();
+        closed = true;
 
     }
 
@@ -158,7 +172,7 @@ public abstract class AbstractStatement<T> implements VirtualStatement<T>{
 
     @Override
     public Connection getConnection() throws SQLException {
-        return null;
+        return virtualConnection;
     }
 
     @Override
@@ -240,4 +254,6 @@ public abstract class AbstractStatement<T> implements VirtualStatement<T>{
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
         return false;
     }
+
+
 }

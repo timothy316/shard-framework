@@ -1,18 +1,15 @@
 package org.timothy.shard.core;
 
-import org.timothy.shard.core.sharding.Shard;
 import org.timothy.shard.core.sharding.ShardAndSql;
-import org.timothy.shard.core.sharding.Sql;
+import org.timothy.shard.core.sql.Sql;
 
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.*;
-import java.util.Calendar;
-import java.util.Comparator;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.sql.Date;
+import java.util.*;
 
 /**
  * @author zhengxun
@@ -47,6 +44,13 @@ public abstract class AbstractPreparedStatement<T> extends AbstractStatement<T> 
         public Integer getSqlType() {
             return SqlType;
         }
+
+        @Override
+        public String toString() {
+            return "Null{" +
+                    "SqlType=" + SqlType +
+                    '}';
+        }
     }
 
 
@@ -66,6 +70,15 @@ public abstract class AbstractPreparedStatement<T> extends AbstractStatement<T> 
     public PreparedStatement getActualPreparedStatement() throws SQLException {
         ShardAndSql shardAndSql = createShardAndSql(new Sql(sql, true, parameters));
         PreparedStatement preparedStatement = (PreparedStatement) createActualStatement(shardAndSql);
+        if(!shardAndSql.getSql().getParameters().isEmpty()){
+            for (Map.Entry<Integer, Object> parameter : shardAndSql.getSql().getParameters().entrySet()) {
+                if(parameter.getValue() instanceof Null){
+                    preparedStatement.setNull(parameter.getKey(), ((Null) parameter.getValue()).getSqlType());
+                } else {
+                    preparedStatement.setObject(parameter.getKey(), parameter.getValue());
+                }
+            }
+        }
 
         return preparedStatement;
     }
@@ -82,7 +95,7 @@ public abstract class AbstractPreparedStatement<T> extends AbstractStatement<T> 
 
     @Override
     public boolean execute() throws SQLException {
-        return false;
+        return getActualPreparedStatement().execute();
     }
 
     @Override

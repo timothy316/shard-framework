@@ -2,7 +2,8 @@ package org.timothy.shard.core;
 
 import org.timothy.shard.core.sharding.DataSourceItem;
 import org.timothy.shard.core.sharding.Shard;
-import org.timothy.shard.core.sharding.ShardConfig;
+import org.timothy.shard.core.sharding.ShardRouterStrategy;
+import org.timothy.shard.core.sql.SqlParseAndBuilderFactory;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -16,28 +17,44 @@ import java.util.List;
  * @date 2018-05-18
  */
 public class ShardDataSource extends AbstractDataSource<Shard> {
+
+    /**
+     * 默认LRUCache缓存大小
+     */
+    private final int DEFAULT_SQL_CACHE_SIZE = 1 << 16;
+
+    private boolean alterTableUseShardId = true;
+
+    private SqlParseAndBuilderFactory sqlParseAndBuilderFactory;
     /**
      * 实际的数据源列表
      */
     private List<DataSourceItem> actualDataSourceItems;
-    /**
-     * 拆分基本配置
-     */
-    private ShardConfig shardConfig;
 
-    public ShardDataSource(List<DataSourceItem> actualDataSourceItems, ShardConfig shardConfig) {
+
+    private ShardRouterStrategy shardRouterStrategy;
+
+    public ShardDataSource(List<DataSourceItem> actualDataSourceItems, ShardRouterStrategy shardRouterStrategy) {
+        this(actualDataSourceItems, shardRouterStrategy, -1);
+    }
+
+    public ShardDataSource(List<DataSourceItem> actualDataSourceItems, ShardRouterStrategy shardRouterStrategy, int sqlCacheSize) {
         this.actualDataSourceItems = actualDataSourceItems;
-        this.shardConfig = shardConfig;
+        this.shardRouterStrategy = shardRouterStrategy;
+        if (sqlCacheSize < 1) {
+            sqlCacheSize = DEFAULT_SQL_CACHE_SIZE;
+        }
+        sqlParseAndBuilderFactory = new SqlParseAndBuilderFactory(sqlCacheSize);
     }
 
     @Override
     public Connection getConnection() throws SQLException {
-        return new ShardConnection(this, shardConfig);
+        return new ShardConnection(this, this.shardRouterStrategy);
     }
 
     @Override
     public Connection getConnection(String username, String password) throws SQLException {
-        return new ShardConnection(this, shardConfig, username, password);
+        return new ShardConnection(this, this.shardRouterStrategy, username, password);
     }
 
     /**
@@ -56,5 +73,17 @@ public class ShardDataSource extends AbstractDataSource<Shard> {
             }
         }
         return actualDataSource;
+    }
+
+    public SqlParseAndBuilderFactory getSqlParseAndBuilderFactory() {
+        return sqlParseAndBuilderFactory;
+    }
+
+    public boolean isAlterTableUseShardId() {
+        return alterTableUseShardId;
+    }
+
+    public void setAlterTableUseShardId(boolean alterTableUseShardId) {
+        this.alterTableUseShardId = alterTableUseShardId;
     }
 }

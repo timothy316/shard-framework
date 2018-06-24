@@ -1,4 +1,4 @@
-package org.timothy.shard.core.sharding;
+package org.timothy.shard.core.sql;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ public class ShardTable {
     /**
      * 拆分键
      */
-    private List<String> columnList;
+    private List<String> shardColumnNameList;
 
     public String getTableName() {
         return tableName;
@@ -27,19 +27,19 @@ public class ShardTable {
         this.tableName = tableName;
     }
 
-    public List<String> getColumnList() {
-        return columnList;
+    public List<String> getShardColumnNameList() {
+        return shardColumnNameList;
     }
 
-    public void setColumnList(List<String> columnList) {
-        this.columnList = columnList;
+    public void setShardColumnNameList(List<String> shardColumnNameList) {
+        this.shardColumnNameList = shardColumnNameList;
     }
 
     @Override
     public String toString() {
         return "ShardTable{" +
                 "tableName='" + tableName + '\'' +
-                ", columnList=" + columnList +
+                ", shardColumnNameList=" + shardColumnNameList +
                 '}';
     }
 }
