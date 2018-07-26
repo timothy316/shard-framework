@@ -53,7 +53,7 @@
         <constructor-arg index="1">
             <bean class="org.timothy.shard.core.sharding.router.HashShardRouterStrategy">
                 <constructor-arg index="0">
-                    <bean class="org.timothy.shard.core.sharding.router.ShardConfig">
+                    <bean class="org.timothy.shard.core.sharding.router.ShardConfigRule">
                         <property name="shardSize" value="4"/>
                         <property name="shardTableList">
                             <list>
@@ -71,11 +71,11 @@
                         <property name="shardMappingList">
                             <list>
                                 <bean class="org.timothy.shard.core.sharding.ShardMapping">
-                                    <property name="shardId" value="0"/>
+                                    <property name="shardIdRange" value="0-1"/>
                                     <property name="dataSourceName" value="dataSource1"/>
                                 </bean>
                                 <bean class="org.timothy.shard.core.sharding.ShardMapping">
-                                    <property name="shardId" value="1"/>
+                                    <property name="shardIdRange" value="2-3"/>
                                     <property name="dataSourceName" value="dataSource2"/>
                                 </bean>
                             </list>

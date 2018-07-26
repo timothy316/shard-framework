@@ -9,35 +9,59 @@ public class User {
 
     private String remark;
 
-    public Long getId() {
-        return id;
+    public static Builder builder() {
+        return new Builder();
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public static class Builder {
+        private Long id;
+
+        private String name;
+
+        private Integer sex;
+
+        private String remark;
+
+        public Builder() {
+        }
+
+        public Builder(Long id, String name, Integer sex, String remark) {
+            this.id = id;
+            this.name = name;
+            this.sex = sex;
+            this.remark = remark;
+        }
+
+        public Builder id(Long id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder sex(Integer sex) {
+            this.sex = sex;
+            return this;
+        }
+
+        public Builder remark(String remark) {
+            this.remark = remark;
+            return this;
+        }
+
+        public User build() {
+            return new User(this);
+        }
     }
 
-    public String getName() {
-        return name;
+    public User(Builder builder) {
+        this.id = builder.id;
+        this.name = builder.name;
+        this.sex = builder.sex;
+        this.remark = builder.remark;
     }
 
-    public void setName(String name) {
-        this.name = name == null ? null : name.trim();
-    }
-
-    public Integer getSex() {
-        return sex;
-    }
-
-    public void setSex(Integer sex) {
-        this.sex = sex;
-    }
-
-    public String getRemark() {
-        return remark;
-    }
-
-    public void setRemark(String remark) {
-        this.remark = remark == null ? null : remark.trim();
-    }
 }

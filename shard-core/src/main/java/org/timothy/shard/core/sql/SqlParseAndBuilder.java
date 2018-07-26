@@ -58,14 +58,18 @@ public class SqlParseAndBuilder {
 
     public SqlParseAndBuilder(String sql) {
         this.sql = sql;
-        long startTime = System.currentTimeMillis();
+        long startTime = 0;
+        if (logger.isDebugEnabled()) {
+            startTime = System.currentTimeMillis();
+        }
+        //解析
         parse(this.sql);
         if (logger.isDebugEnabled()) {
             logger.debug("解析SQL耗时" + (System.currentTimeMillis() - startTime) + "毫秒, sql:" + sql);
         }
     }
 
-    public String createSqlPlaceWithShardId(Integer shardId){
+    public String createSqlPlaceWithShardId(Integer shardId) {
         return sqlAndPlaceHolder.replaceAll(suffixPlaceHolder, new StringBuilder(SEPARATOR).append(shardId).toString());
     }
 
@@ -97,7 +101,7 @@ public class SqlParseAndBuilder {
 
         StringBuilder tableName = new StringBuilder();
         for (Table table : tableMap.keySet()) {
-            if(tableName.length() > 0){
+            if (tableName.length() > 0) {
                 tableName.delete(0, tableName.length());
             }
             tableName.append(table.getName())

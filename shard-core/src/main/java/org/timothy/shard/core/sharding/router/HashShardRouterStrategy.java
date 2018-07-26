@@ -15,18 +15,18 @@ import java.util.*;
  */
 public class HashShardRouterStrategy extends AbstractShardRouterStrategy {
 
-    public HashShardRouterStrategy(ShardConfig shardConfig) {
-        super(shardConfig);
+    public HashShardRouterStrategy(ShardConfigRule shardConfigRule) {
+        super(shardConfigRule);
     }
 
     @Override
-    protected Shard doRoute(ShardConfig shardConfig, List<TableValue> tableValueList) {
+    protected Shard doRoute(ShardConfigRule shardConfigRule, List<TableValue> tableValueList) {
         ShardTable matchedShardTable = null;
         TableValue matchedTableValue = null;
 
-        shardConfig.getShardTableList();
+        shardConfigRule.getShardTableList();
         for (TableValue tableValue : tableValueList) {
-            for (ShardTable shardTable : shardConfig.getShardTableList()) {
+            for (ShardTable shardTable : shardConfigRule.getShardTableList()) {
                 HashMultimap<String, String> shardColumnMap = HashMultimap.create();
                 Map<String, ColumnValue> columnValueMap = new HashMap<>(shardTable.getShardColumnNameList().size());
                 if (shardTable.getTableName().equalsIgnoreCase(tableValue.getTableName())) {
@@ -80,8 +80,8 @@ public class HashShardRouterStrategy extends AbstractShardRouterStrategy {
             shardValue.append(columnValue.getColumnValue());
         }
         long h;
-        int shardId = (int) (((h = hash.hash(shardValue.toString())) ^ (h >>> 32)) & (shardConfig.getShardSize() - 1));
-        String dataSourceName = shardConfig.getDataSourceNameByShardId(shardId);
+        int shardId = (int) (((h = hash.hash(shardValue.toString())) ^ (h >>> 32)) & (shardConfigRule.getShardSize() - 1));
+        String dataSourceName = shardConfigRule.getDataSourceNameByShardId(shardId);
         if (dataSourceName == null) {
             throw new RuntimeException("未找到对应的数据源名称，请确认是否配置");
         }

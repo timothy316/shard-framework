@@ -18,17 +18,17 @@ import java.util.List;
 public abstract class AbstractShardRouterStrategy implements ShardRouterStrategy {
 
     protected Hashing hash = new MurmurHash();
-    private ShardConfig shardConfig;
+    private ShardConfigRule shardConfigRule;
 
-    public AbstractShardRouterStrategy(ShardConfig shardConfig) {
-        this.shardConfig = shardConfig;
+    public AbstractShardRouterStrategy(ShardConfigRule shardConfigRule) {
+        this.shardConfigRule = shardConfigRule;
     }
 
     @Override
     public Shard route(RoutingValue routingValue) {
-        return doRoute(shardConfig, routingValue.getTableValueList());
+        return doRoute(shardConfigRule, routingValue.getTableValueList());
     }
 
 
-    protected abstract Shard doRoute(ShardConfig shardConfig, List<TableValue> tableValueList);
+    protected abstract Shard doRoute(ShardConfigRule shardConfigRule, List<TableValue> tableValueList);
 }

@@ -1,5 +1,6 @@
 package org.timothy.shard.core;
 
+import org.timothy.shard.core.sharding.Shard;
 import org.timothy.shard.core.sharding.ShardRouterStrategy;
 
 import java.sql.PreparedStatement;
@@ -12,7 +13,7 @@ import java.sql.Statement;
  * @author zhengxun
  * @date 2018-05-18
  */
-public class ShardConnection extends AbstractConnection {
+public class ShardConnection extends AbstractConnection<Shard> {
 
     private ShardRouterStrategy shardRouterStrategy;
 
@@ -28,11 +29,16 @@ public class ShardConnection extends AbstractConnection {
 
     @Override
     public Statement createStatement() throws SQLException {
-        return new ShardStatement(this.shardRouterStrategy,this, null);
+        return new ShardStatement(this.shardRouterStrategy, this, null);
     }
 
     @Override
     public PreparedStatement prepareStatement(String sql) throws SQLException {
         return new ShardStatement(this.shardRouterStrategy, this, sql);
+    }
+
+    @Override
+    protected String createCacheKey(Shard shard) {
+        return shard.getDataSourceName();
     }
 }
